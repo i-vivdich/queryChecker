@@ -7,5 +7,5 @@ function getInterval() {
 }
 
 function setInterval(time) {
-	fs.writeFileSync('settings.json', JSON.stringify({"checkInterval": time}, 'utf8'));
+	fs.writeFileSync('settings.json', JSON.stringify({"checkInterval": time}), 'utf8');
 }

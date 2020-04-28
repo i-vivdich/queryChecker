@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const interval = require('./interval');
+const subscription = require('./subscription');
 
 const token = '1289063456:AAFecnCxAcB2UkkfVoQEB3gtCndKfx2zFVg'
 const bot = new TelegramBot(token, { polling: true });
@@ -35,13 +36,13 @@ function respondToUser(msg) {
 	const matchedText = msg.text.match(/^(youtube|google)[\s](.+)$|^([\?])$|^[-](\d+)$/);
 	let response = '';
 
+	// a bit tricky style of writing, could be rewritten in case long-term support is needed
 	if (matchedText !== null) {
-		// dirty style of writing, should be rewritten in case long-term support is needed
 		response = (matchedText[1] === 'youtube' || matchedText[1] === 'google') 
-									? `Your request <b>"${matchedText[2]}"</b> has been added to the subscriptions!`
-									: matchedText[3] === '?' 
-											? "list of subscriptions" 
-											: matchedText[4] ? "delete subscription" : false;
+									? subscription.addSubscription([matchedText[1], matchedText[2]])
+									: matchedText[3] === '?'
+											? subscription.getSubcriptions()
+											: matchedText[4] ? subscription.removeSubcription(matchedText[4]) : false;
 	} else {
 		response = 'Incorrect input format! Should be:\n<code>youtube|google [search_string]</code> - for adding subscription\n<code>?</code> - for listing subscriptions\n<code>-[number]</code> - for deleting nth subscription\n<code>set [number][smhd]</code> - to set interval for parsing';
 
