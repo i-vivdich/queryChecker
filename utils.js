@@ -30,3 +30,12 @@ exports.convertToMs = time => {
 
 	return interval;
 }
+
+exports.fileExists = filename => {
+  try {
+    require('fs').accessSync(filename)
+    return true;
+  } catch (error) {
+    return false;
+  }
+}

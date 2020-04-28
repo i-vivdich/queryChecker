@@ -15,7 +15,7 @@ bot.onText(/^(set)[\s](\d+[smhd])$/, (msg, match) => {
 
 		try {
 			if (Number.parseInt(match[2]) <= 0) {
-			 throw new Error('interval cannot be equal or less than 0')
+				throw new Error('interval cannot be equal or less than 0')
 			}
 
 			interval.setInterval(match[2]);
@@ -41,7 +41,7 @@ function respondToUser(msg) {
 		response = (matchedText[1] === 'youtube' || matchedText[1] === 'google') 
 									? subscription.addSubscription([matchedText[1], matchedText[2]])
 									: matchedText[3] === '?'
-											? subscription.getSubcriptions()
+											? subscription.listSubcriptions()
 											: matchedText[4] ? subscription.removeSubcription(matchedText[4]) : false;
 	} else {
 		response = 'Incorrect input format! Should be:\n<code>youtube|google [search_string]</code> - for adding subscription\n<code>?</code> - for listing subscriptions\n<code>-[number]</code> - for deleting nth subscription\n<code>set [number][smhd]</code> - to set interval for parsing';
