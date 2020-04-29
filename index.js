@@ -1,6 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const interval = require('./interval');
 const subscription = require('./subscription');
+const parser = require('./parser');
 
 const token = '1289063456:AAFecnCxAcB2UkkfVoQEB3gtCndKfx2zFVg'
 const bot = new TelegramBot(token, { polling: true });
@@ -29,20 +30,20 @@ bot.onText(/^(set)[\s](\d+[smhd])$/, (msg, match) => {
 });
 
 // listen for any kind of message - but we are aiming only for text messages
-bot.on('message', respondToUser)
+bot.on('message', initiateBotLifeCycle)
 
-function respondToUser(msg) {
+function initiateBotLifeCycle(msg) {
 	const chatId = msg.chat.id;
 	const matchedText = msg.text.match(/^(youtube|google)[\s](.+)$|^([\?])$|^[-](\d+)$/);
 	let response = '';
 
-	// a bit tricky style of writing, could be rewritten in case long-term support is needed
+	// a bit tricky style of writing (lulz), could be rewritten in case long-term support is needed
 	if (matchedText !== null) {
 		response = (matchedText[1] === 'youtube' || matchedText[1] === 'google') 
 									? subscription.addSubscription([matchedText[1], matchedText[2]])
 									: matchedText[3] === '?'
-											? subscription.listSubcriptions()
-											: matchedText[4] ? subscription.removeSubcription(matchedText[4]) : false;
+											? subscription.listSubscriptions()
+											: matchedText[4] ? subscription.removeSubscription(matchedText[4]) : false;
 	} else {
 		response = 'Incorrect input format! Should be:\n<code>youtube|google [search_string]</code> - for adding subscription\n<code>?</code> - for listing subscriptions\n<code>-[number]</code> - for deleting nth subscription\n<code>set [number][smhd]</code> - to set interval for parsing';
 
@@ -53,5 +54,7 @@ function respondToUser(msg) {
 		}
 	}
 
-	bot.sendMessage(chatId, response, {parse_mode: "HTML"});
+	// bot.sendMessage(chatId, response, {parse_mode: "HTML"});
+	
+	bot.sendMessage(chatId, parseSubscriptions(), {parse_mode: "HTML"});
 }
