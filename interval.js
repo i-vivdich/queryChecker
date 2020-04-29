@@ -1,11 +1,14 @@
 const fs = require('fs');
 const utils = require('./utils');
 
-function getInterval() {
-	data = fs.readFileSync('settings.json');
-	return utils.convertToMs(JSON.parse(data).checkInterval)
+exports.getInterval = () => {
+	if (!utils.fileExists('settings.json')) {
+		this.setInterval('1h');
+	}
+	
+	return utils.convertToMs(JSON.parse(fs.readFileSync('settings.json')).checkInterval)
 }
 
-function setInterval(time) {
+exports.setInterval = (time) => {
 	fs.writeFileSync('settings.json', JSON.stringify({"checkInterval": time}), 'utf8');
 }

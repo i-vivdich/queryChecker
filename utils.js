@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 exports.convertToMs = time => {
 	matchedText = time.match(/^(\d+)([[smhd])$/);
 	interval = ''
@@ -38,4 +40,31 @@ exports.fileExists = filename => {
   } catch (error) {
     return false;
   }
+}
+
+exports.rearrangeObjectKeys = (oldObject, index) => {
+	const newSubObj = {};
+	const keys = Object.keys(oldObject);
+
+	for (let i = 1, j = 0; i <= Object.keys(oldObject).length; i++, j++) {
+		if (index < keys[j]) {
+			newSubObj[keys[j] - 1] = oldObject[keys[j]];
+		} else {
+			newSubObj[i] = oldObject[i];
+		}
+	}
+
+	return newSubObj;
+}
+
+exports.getResultObject = () => {
+  let resultObj = {};
+
+  if (!this.fileExists('result.json')) {
+    throw new Error('There are no results yet. Nothing to synchronize');
+  } else {
+    resultObj = fs.readFileSync('result.json');
+  }
+  
+  return JSON.parse(resultObj);
 }

@@ -5,7 +5,7 @@ exports.addSubscription = sub => {
 	let response = '';
 
 	try {
-	  const subs = JSON.parse(getSubscriptions())
+	  const subs = JSON.parse(this.getSubscriptions())
 		let subsCount = Object.keys(subs).length;
 
 		subs[++subsCount] = sub; // add check for existed querry
@@ -23,7 +23,7 @@ exports.listSubscriptions = () => {
 	let response = '';
 
 	try {
-		const subs = JSON.parse(getSubscriptions());
+		const subs = JSON.parse(this.getSubscriptions());
 		const subsLength = Object.keys(subs).length;
 
 		if (subsLength > 0) {
@@ -42,25 +42,27 @@ exports.listSubscriptions = () => {
 
 exports.removeSubscription = (index) => {
 	let response = '';
-	const newSubObj = {};
 
 	try {
-		const subs = JSON.parse(getSubscriptions());
-		
-		delete subs[index];
+		const subs = JSON.parse(this.getSubscriptions());
+		const subsLength = Object.keys(subs).length
 
-		const keys = Object.keys(subs); // make a stand-alone function in utils.js
-		for (let i = 1, j = 0; i <= Object.keys(subs).length; i++, j++) {
-			if (index < keys[j]) {
-				newSubObj[keys[j] - 1] = subs[keys[j]];
-			} else {
-				newSubObj[i] = subs[i];
-			}
+		if (index > subsLength || index == 0) {
+			throw new Error(`${index}-th element is not present in the subscriptions list. There are only 1 - ${subsLength} elements`);
+		} else {
+			delete subs[index];
 		}
 
+		const newSubObj = utils.rearrangeObjectKeys(subs, index);
 		fs.writeFileSync('subscriptions.json', JSON.stringify(newSubObj), 'utf8');
+
+		const resSubObj = utils.getResultObject();
+		delete resSubObj[index];
+
+		const newResultSubObj = utils.rearrangeObjectKeys(resSubObj, index);
+		fs.writeFileSync('result.json', JSON.stringify(newResultSubObj), 'utf8');
+
 		response = `Subscription number <code>${index}</code> has been removed`;
-		// remove subscription from RESULTS file
 	} catch (error) {
 		response = `Something is wrong on the back-end. Error:\n <code>${error.message}</code>`;
 	}

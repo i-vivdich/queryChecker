@@ -1,10 +1,11 @@
 const TelegramBot = require('node-telegram-bot-api');
+
 const interval = require('./interval');
 const subscription = require('./subscription');
 const parser = require('./parser');
 
-const token = '1289063456:AAFecnCxAcB2UkkfVoQEB3gtCndKfx2zFVg'
-const bot = new TelegramBot(token, { polling: true });
+const token = '1289063456:AAFecnCxAcB2UkkfVoQEB3gtCndKfx2zFVg';
+const bot = new TelegramBot(token, {polling: true});
 
 bot.onText(/^\/(start|help)$/, (msg) => {
 	bot.sendMessage(msg.chat.id, "List of commands:\n-> <code>youtube|google [search_string]</code> - to add subscription to the list\n-> <code>?</code> - to get the list of subscriptions\n-> <code>-[number]</code> - to delete subscription number=[number]\n-> <code>set [number][smhd]</code> - to set interval for parsing", {parse_mode: "HTML"});  
@@ -18,7 +19,6 @@ bot.onText(/^(set)[\s](\d+[smhd])$/, (msg, match) => {
 			if (Number.parseInt(match[2]) <= 0) {
 				throw new Error('interval cannot be equal or less than 0')
 			}
-
 			interval.setInterval(match[2]);
 			response = `Settings have been succesfully updated! New interval is <b>${match[2]}</b>`
 		} catch (error) {
@@ -34,6 +34,7 @@ bot.on('message', initiateBotLifeCycle)
 
 function initiateBotLifeCycle(msg) {
 	const chatId = msg.chat.id;
+
 	const matchedText = msg.text.match(/^(youtube|google)[\s](.+)$|^([\?])$|^[-](\d+)$/);
 	let response = '';
 
@@ -54,7 +55,7 @@ function initiateBotLifeCycle(msg) {
 		}
 	}
 
-	// bot.sendMessage(chatId, response, {parse_mode: "HTML"});
+	bot.sendMessage(chatId, response, {parse_mode: "HTML"});
 	
-	bot.sendMessage(chatId, parseSubscriptions(), {parse_mode: "HTML"});
+	// parser.formResultFile();
 }
