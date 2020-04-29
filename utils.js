@@ -68,3 +68,13 @@ exports.getResultObject = () => {
   
   return JSON.parse(resultObj);
 }
+
+exports.logRequest = () => {
+	if (!this.fileExists('log.txt')) {
+    fs.closeSync(fs.openSync('log.txt', 'a'));
+  }
+
+  const stream = fs.createWriteStream("log.txt", {flags:'a'});
+  stream.write(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '') + "\n");
+	stream.end();
+}

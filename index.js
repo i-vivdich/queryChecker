@@ -1,11 +1,16 @@
 const TelegramBot = require('node-telegram-bot-api');
+const schedule = require('node-schedule');
 
 const interval = require('./interval');
 const subscription = require('./subscription');
 const parser = require('./parser');
+const utils = require('./utils');
 
 const token = '1289063456:AAFecnCxAcB2UkkfVoQEB3gtCndKfx2zFVg';
 const bot = new TelegramBot(token, {polling: true});
+
+const rule = new schedule.RecurrenceRule();
+rule.minute = 1;
 
 bot.onText(/^\/(start|help)$/, (msg) => {
 	bot.sendMessage(msg.chat.id, "List of commands:\n-> <code>youtube|google [search_string]</code> - to add subscription to the list\n-> <code>?</code> - to get the list of subscriptions\n-> <code>-[number]</code> - to delete subscription number=[number]\n-> <code>set [number][smhd]</code> - to set interval for parsing", {parse_mode: "HTML"});  
@@ -57,5 +62,8 @@ function initiateBotLifeCycle(msg) {
 
 	bot.sendMessage(chatId, response, {parse_mode: "HTML"});
 	
-	// parser.formResultFile();
+	const job = schedule.scheduleJob(rule, () => {
+		parser.formResultFile();
+		utils.logRequest();
+	});
 }
