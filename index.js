@@ -11,7 +11,7 @@ const token = '1289063456:AAFecnCxAcB2UkkfVoQEB3gtCndKfx2zFVg';
 const bot = new TelegramBot(token, {polling: true});
 const rule = new schedule.RecurrenceRule();
 rule.minute = 0; // new schedule.Range(0, 59, 15); - to check every 15 minutes
-rule.hours = new Range(0, 23, 1);
+rule.hours = new schedule.Range(0, 23, 1);
 let checker = true;
 
 bot.onText(/^\/(start|help)$/, (msg) => {
