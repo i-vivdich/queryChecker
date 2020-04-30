@@ -57,24 +57,8 @@ exports.rearrangeObjectKeys = (oldObject, index) => {
 	return newSubObj;
 }
 
-exports.getResultObject = () => {
-  let resultObj = {};
-
-  if (!this.fileExists('result.json')) {
-    throw new Error('There are no results yet. Nothing to synchronize');
-  } else {
-    resultObj = fs.readFileSync('result.json');
-  }
-  
-  return JSON.parse(resultObj);
-}
-
 exports.logRequest = () => {
-	if (!this.fileExists('log.txt')) {
-    fs.closeSync(fs.openSync('log.txt', 'a'));
-  }
-
-  const stream = fs.createWriteStream("log.txt", {flags:'a'});
-  stream.write(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '') + "\n");
+  const stream = fs.createWriteStream("queries.log", {flags:'a'});
+  stream.write(new Date().toLocaleString('en-GB', { timeZone: 'Europe/Moscow' }) + "\n")
 	stream.end();
 }

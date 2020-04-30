@@ -56,7 +56,7 @@ exports.removeSubscription = (index) => {
 		const newSubObj = utils.rearrangeObjectKeys(subs, index);
 		fs.writeFileSync('subscriptions.json', JSON.stringify(newSubObj), 'utf8');
 
-		const resSubObj = utils.getResultObject();
+		const resSubObj = this.getResultObject();
 		delete resSubObj[index];
 
 		const newResultSubObj = utils.rearrangeObjectKeys(resSubObj, index);
@@ -77,4 +77,16 @@ exports.getSubscriptions = () => {
 		fs.writeFileSync('subscriptions.json', JSON.stringify({}), 'utf8');
 		return '{}';
 	}
+}
+
+exports.getResultObject = () => {
+  let resultObj = {};
+
+  if (!utils.fileExists('result.json')) {
+    throw new Error('There are no results yet. Nothing to synchronize');
+  } else {
+    resultObj = fs.readFileSync('result.json');
+  }
+  
+  return JSON.parse(resultObj);
 }
