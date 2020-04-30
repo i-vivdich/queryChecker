@@ -30,7 +30,7 @@ exports.parseSubs = (urls, visible = false) => {
   });
 }
 
-exports.insertNewQuery = (subs, index, visible = false) => {
+exports.insertNewQuery = async (subs, index, visible = false) => {
   const nightmare = new Nightmare({show: visible});
   const [url, query] = subs[index];
   const searchQuery = getQuery(url, query);

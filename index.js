@@ -15,7 +15,7 @@ rule.minute = new schedule.Range(0, 59, 2); // new schedule.Range(0, 59, 15); - 
 let checker = true;
 
 bot.onText(/^\/(start|help)$/, (msg) => {
-	bot.sendMessage(msg.chat.id, "List of commands:\n-> <code>youtube|google [search_string]</code> - to add subscription to the list\n-> <code>?</code> - to get the list of subscriptions\n-> <code>-[number]</code> - to delete subscription number=[number]", {parse_mode: "HTML"});  
+	bot.sendMessage(msg.chat.id, "List of commands:\n-> <code>youtube|google [search_string]</code> - to add subscription to the list\n-> <code>?</code> - to get the list of subscriptions\n-> <code>-[number]</code> - to delete subscription number=[number]", {parse_mode: "HTML"});
 });
 
 bot.onText(/^(set)[\s](\d+[smhd])$/, (msg, match) => {
