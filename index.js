@@ -10,8 +10,8 @@ const utils = require('./utils');
 const token = '1289063456:AAFecnCxAcB2UkkfVoQEB3gtCndKfx2zFVg';
 const bot = new TelegramBot(token, {polling: true});
 const rule = new schedule.RecurrenceRule();
-rule.minute = 0; // new schedule.Range(0, 59, 15); - to check every 15 minutes
-rule.hours = new schedule.Range(0, 23, 1);
+rule.minute = new schedule.Range(0, 59, 2); // new schedule.Range(0, 59, 15); - to check every 15 minutes
+// rule.hours = new schedule.Range(0, 23, 1);
 let checker = true;
 
 bot.onText(/^\/(start|help)$/, (msg) => {
@@ -42,12 +42,12 @@ bot.on('message', initiateBotLifeCycle)
 function initiateBotLifeCycle(msg) {
 	const chatId = msg.chat.id;
 
-	const matchedText = msg.text.match(/^(youtube|google)[\s](.+)$|^([\?])$|^[-](\d+)$/);
+	const matchedText = msg.text.match(/^(y|youtube|google|g)[\s](.+)$|^([\?])$|^[-](\d+)$/);
 	let response = '';
 
 	// a bit tricky style of writing (lulz), could be rewritten in case long-term support is needed
 	if (matchedText !== null) {
-		response = (matchedText[1] === 'youtube' || matchedText[1] === 'google') 
+		response = (matchedText[1] === 'youtube' || matchedText[1] === 'google' || matchedText[1] === 'y' || matchedText[1] === 'g') 
 									? subscription.addSubscription([matchedText[1], matchedText[2]])
 									: matchedText[3] === '?'
 											? subscription.listSubscriptions()
@@ -66,33 +66,31 @@ function initiateBotLifeCycle(msg) {
 
 	if (checker) {
 		const job = schedule.scheduleJob(rule, () => {
-			if (!utils.fileExists('result.json')) {
-				parser.formResultFile();
-			} else {
-				const oldResult = subscription.getResultObject();
-				const oldLength = Object.keys(oldResult).length;
-				const subs = JSON.parse(subscription.getSubscriptions());
+			const oldResult = subscription.getResultObject();
+			const oldLength = Object.keys(oldResult).length;
+			const subs = JSON.parse(subscription.getSubscriptions());
 
-				parser.parseSubs(subs, false)
-	 				.then(results => {
-	 					const resultOutput = {};
+			parser.parseSubs(subs, true)
+	 			.then(results => {
+	 				const resultOutput = {};
 
-		 				for (let i = 0; i < results.length; i++) {
-		 					const { title: newTitle, url: newUrl } = results[i];
-		 					if (i >= oldLength) {
-		 						resultOutput[i + 1] = results[i];
-		 					} else {
-		 						const { title: oldTitle, url: oldUrl } = oldResult[i + 1];
+		 			for (let i = 0; i < results.length; i++) {
+		 				const { title: newTitle, url: newUrl } = results[i];
+		 				if (i >= oldLength) {
+		 					resultOutput[i + 1] = results[i];
+		 				} else {
+		 					const { title: oldTitle, url: oldUrl } = oldResult[i + 1];
 
-		 						if (newTitle != oldTitle || newUrl != oldUrl) {
-		 							bot.sendMessage(chatId, `Update on your sub "<b><code>${subs[i + 1][1]}</code></b>" is found:\n<b><a href=\"${newUrl}\">${newTitle}</a></b>`, {parse_mode: "HTML"});
-		 						} 
-		 						resultOutput[i + 1] = results[i];
-		 					}
+		 					if ((newTitle != oldTitle) || (newUrl != oldUrl)) {
+		 						bot.sendMessage(chatId, `Update on your sub "<b><code>${subs[i + 1][1]}</code></b>" is found:\n<b><a href=\"${newUrl}\">${newTitle}</a></b>`, {parse_mode: "HTML"});
+		 					} 
+		 					resultOutput[i + 1] = results[i];
 		 				}
-	   				fs.writeFileSync('result.json', JSON.stringify(resultOutput, 'utf8'));
-	  			});
-			}
+		 			}
+
+	   			fs.writeFileSync('result.json', JSON.stringify(resultOutput, 'utf8'));
+	  		});
+
 			utils.logRequest();
 		});
 		checker = false;

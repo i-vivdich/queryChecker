@@ -1,17 +1,34 @@
 const fs = require('fs');
 const utils = require('./utils');
+const parser = require('./parser')
 
 exports.addSubscription = sub => {
 	let response = '';
 
 	try {
 	  const subs = JSON.parse(this.getSubscriptions())
-		let subsCount = Object.keys(subs).length;
+		let newSubIndex = Object.keys(subs).length;
+		newSubIndex++;
 
-		subs[++subsCount] = sub; // add check for existed querry
+		normalizedSub = sub.map(x => {
+			if (x === 'y') {
+				return 'youtube';
+			} else if (x === 'g') {
+				return 'google';
+			} else {
+				return x;
+			}
+		})
+
+		subs[newSubIndex] = normalizedSub; // add check for existed querry
 
 	  fs.writeFileSync('subscriptions.json', JSON.stringify(subs), 'utf8');
-	  response = `Your request <b>"${sub[1]}"</b> has been added to the subscriptions!`;
+		parser.insertNewQuery(subs, newSubIndex, true);
+
+		const updatedResultObject = this.getResultObject();
+		// const { title, url } = updatedResultObject[newSubIndex];
+		response = `Your request <b>"${sub[1]}"</b> has been added to the subscriptions!`;
+		// response = `Your request <b>"${sub[1]}"</b> has been added to the subscriptions!\nFirst look up on the request:\n<b><a href=\"${t}\">${t}</a></b>`;
 	} catch (error) {
 		response = `Something is wrong on the back-end. Error:\n <code>${error.message}</code>`;
 	}
@@ -80,13 +97,5 @@ exports.getSubscriptions = () => {
 }
 
 exports.getResultObject = () => {
-  let resultObj = {};
-
-  if (!utils.fileExists('result.json')) {
-    throw new Error('There are no results yet. Nothing to synchronize');
-  } else {
-    resultObj = fs.readFileSync('result.json');
-  }
-  
-  return JSON.parse(resultObj);
+  return utils.fileExists('result.json') ? JSON.parse(fs.readFileSync('result.json')) : {};
 }
